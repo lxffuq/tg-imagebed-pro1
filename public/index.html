@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f7fb"><title>TG ImageBed Pro</title>
+<style>
+:root{--bg:#f5f7fb;--card:#ffffff;--text:#172033;--muted:#738097;--border:#e6eaf1;--accent:#2563eb;--accent-soft:#e8f0fe;--accent-border:#bfdbfe;--danger:#dc2626;--danger-soft:#fef2f2;--green:#16a34a;--shadow:0 4px 16px rgba(20,32,58,.05);--nav-h:64px}
+html.dark{--bg:#0b1220;--card:#16213a;--text:#eef2f7;--muted:#93a1b8;--border:#26334d;--accent:#3b82f6;--accent-soft:#17294d;--accent-border:#2b4a7a;--danger:#f87171;--danger-soft:#3a1d1d;--green:#4ade80;--shadow:0 4px 16px rgba(0,0,0,.35)}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB",sans-serif;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:12px;padding:10px 14px;font-weight:600}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.danger{background:var(--danger-soft);color:var(--danger);border-color:var(--danger-soft)}
+button:disabled{opacity:.45;cursor:default}
+input,select{font:inherit;color:var(--text)}
+input[type=password],input[type=text]{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;outline:none;width:100%}
+input:focus{border-color:var(--accent)}
+.hidden{display:none!important}
+.wrap{max-width:1000px;margin:0 auto;padding:14px 14px 96px;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+/* 顶栏 */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 2px 14px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:46px;height:46px;flex:none;border-radius:15px;background:linear-gradient(135deg,#38bdf8,#2563eb);display:grid;place-items:center;box-shadow:0 6px 16px rgba(37,99,235,.35)}
+.logo svg{width:26px;height:26px;fill:#fff}
+.brand h1{font-size:20px;margin:0;font-weight:800;letter-spacing:.2px;white-space:nowrap}
+.brand p{margin:3px 0 0;font-size:12.5px;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:10px}
+.icon-btn{width:42px;height:42px;border-radius:50%;padding:0;display:grid;place-items:center;background:var(--card);box-shadow:var(--shadow)}
+.icon-btn svg{width:20px;height:20px;stroke:var(--text);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* 登录 */
+.login{max-width:430px;margin:9vh auto 0;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px 20px;box-shadow:var(--shadow)}
+.login h2{margin:0 0 6px;font-size:19px}
+.login p{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+.notice{font-size:13px;padding:10px 12px;border-radius:12px;margin-top:12px;display:none}
+.notice.show{display:block}
+.notice.ok{background:#eaf8ef;color:#17633a}
+.notice.bad{background:var(--danger-soft);color:var(--danger)}
+html.dark .notice.ok{background:#12351f;color:#86efac}
+/* 上传区 */
+.dropzone{border:1.5px dashed var(--accent-border);border-radius:18px;padding:40px 16px 36px;text-align:center;background:var(--card);box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:440px;width:100%;max-width:760px;margin:auto}
+@media(min-width:780px){.dropzone{min-height:480px}}
+.dropzone.drag{border-style:solid;border-color:var(--accent);background:var(--accent-soft)}
+.dropzone .cloud{width:64px;height:64px;margin:0 auto 10px;border-radius:50%;background:linear-gradient(135deg,#38bdf8,#2563eb);display:grid;place-items:center;box-shadow:0 8px 20px rgba(37,99,235,.35)}
+.dropzone .cloud svg{width:32px;height:32px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dropzone strong{display:block;font-size:18px;margin-bottom:6px}
+.dropzone strong+p{color:var(--muted);font-size:13px;margin:0 0 16px}
+.dropzone .primary{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:999px;font-size:15px}
+.dropzone .primary svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* 统计卡片 */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px 10px;box-shadow:var(--shadow);min-width:0}
+.stat .ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;margin-bottom:8px}
+.stat .ic svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.stat .lb{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.stat .vl{font-size:16.5px;font-weight:800;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .dl{font-size:11px;color:var(--green);margin-top:3px}
+.stat .dl.dim{color:var(--muted)}
+/* 搜索 + 筛选 */
+.search-row{display:flex;gap:10px;margin-bottom:12px}
+.search-box{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:0 14px;box-shadow:var(--shadow)}
+.search-box svg{width:17px;height:17px;flex:none;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round}
+.search-box input{border:none;background:none;padding:11px 0;outline:none}
+.search-box input::placeholder{color:var(--muted)}
+.filter-btn{display:flex;align-items:center;gap:6px;border-radius:999px;box-shadow:var(--shadow);padding:10px 14px;font-size:13.5px}
+.filter-btn select{border:none;background:none;outline:none;font-weight:600;font-size:13.5px;max-width:86px}
+/* Tabs */
+.tabs{display:flex;gap:10px;margin-bottom:14px}
+.tab{flex:1;border-radius:999px;padding:10px 6px;text-align:center;font-size:14px;font-weight:600;background:var(--card);box-shadow:var(--shadow);border:1px solid var(--border)}
+.tab.active{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border)}
+/* 图片网格 */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.item{position:relative;border-radius:14px;overflow:hidden;background:var(--card);border:1px solid var(--border);aspect-ratio:4/3.4;box-shadow:var(--shadow)}
+.item img{width:100%;height:100%;object-fit:cover;display:block}
+.item .ck{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(0,0,0,.25);display:grid;place-items:center;padding:0}
+.item .ck svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.item.sel .ck{background:var(--accent);border-color:var(--accent)}
+.item.sel .ck svg{opacity:1}
+.item.sel{outline:2px solid var(--accent);outline-offset:-2px}
+.item .fav{position:absolute;top:8px;left:8px;width:26px;height:26px;border-radius:50%;border:none;background:rgba(0,0,0,.25);color:#fff;display:grid;place-items:center;padding:0;font-size:14px;line-height:1}
+.item .fav.on{color:#fbbf24}
+.item .size{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:3px 8px;border-radius:999px}
+.empty{grid-column:1/-1;text-align:center;padding:48px 10px;color:var(--muted);font-size:14px}
+.pagination{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:18px;color:var(--muted);font-size:13.5px}
+/* 管理列表 */
+.mrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;margin-bottom:10px;box-shadow:var(--shadow)}
+.mrow img{width:56px;height:56px;border-radius:10px;object-fit:cover;flex:none}
+.mrow .nm{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .mt{font-size:12px;color:var(--muted);margin-top:3px}
+.mrow .sp{flex:1;min-width:0}
+.mrow button{padding:8px 10px;font-size:12.5px}
+/* 统计 / 设置页 */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 16px;box-shadow:var(--shadow);margin-bottom:14px}
+.panel h3{margin:0 0 14px;font-size:16px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:11px 2px;border-bottom:1px solid var(--border);font-size:14px}
+.kv:last-child{border-bottom:none}
+.kv span:first-child{color:var(--muted)}
+.kv span:last-child{font-weight:600;text-align:right;word-break:break-all}
+.big-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.big-stats .stat .vl{font-size:20px}
+/* 底部选中条 */
+.batchbar{position:fixed;left:0;right:0;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom));z-index:30;background:var(--card);border-top:1px solid var(--border);box-shadow:0 -6px 20px rgba(20,32,58,.10);padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+.batchbar .inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:8px}
+.batchbar .cnt{color:var(--accent);font-weight:700;font-size:14px;white-space:nowrap}
+.batchbar button{flex:1;padding:9px 4px;font-size:13px;white-space:nowrap}
+.batchbar .more-wrap{position:relative;flex:1}
+.batchbar .more-wrap>button{width:100%;background:var(--accent);border-color:var(--accent);color:#fff}
+.menu{position:absolute;bottom:calc(100% + 8px);right:0;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);min-width:170px;overflow:hidden}
+.menu button{display:block;width:100%;border:none;border-radius:0;text-align:left;padding:12px 14px;background:none;font-size:14px}
+.menu button:hover{background:var(--accent-soft)}
+/* 底部导航 */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--card);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
+.bottomnav .inner{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);height:var(--nav-h)}
+.nav-it{border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:12px;border-radius:0;padding:6px 0}
+.nav-it svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-it.active{color:var(--accent)}
+.nav-it.active::after{content:"";width:34px;height:3px;border-radius:3px;background:var(--accent);margin-top:2px}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 70px);transform:translateX(-50%);background:rgba(0,0,0,.82);color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;z-index:50;display:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{display:block}
+#lightbox{position:fixed;inset:0;z-index:60;background:rgba(4,7,16,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px}
+#lbImg{max-width:100%;max-height:66vh;object-fit:contain;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.lb-x{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:17px}
+.lb-arrow{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:24px;line-height:1}
+#lbPrev{left:10px}
+#lbNext{right:10px}
+.lb-bar{width:100%;max-width:640px;margin-top:16px;color:#fff}
+.lb-info #lbName{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-info #lbMeta{font-size:12.5px;color:rgba(255,255,255,.65);margin-top:4px}
+.lb-actions{display:flex;gap:10px;margin-top:12px}
+.lb-actions button{flex:1}
+.lb-actions .danger{background:rgba(220,38,38,.85);border-color:transparent;color:#fff}
+.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+/* 上传结果多格式链接 */
+#app{flex:1;display:flex;flex-direction:column}
+#view-home{flex:1;display:flex;flex-direction:column;align-items:center}
+#view-manage{padding-bottom:74px}
+#uploadProgress{align-self:stretch;margin-top:14px}
+.up-bar{height:8px;border-radius:999px;background:var(--accent-soft);overflow:hidden}
+#uploadBarFill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#38bdf8,#2563eb);transition:width .15s ease}
+#uploadBarText{font-size:12.5px;color:var(--muted);margin-top:6px}
+#uploadResults{text-align:left;align-self:stretch}
+#uploadResults h3{margin:0;font-size:16px}
+.up-divider{border-top:1px dashed var(--border);margin:20px 0 14px}
+.up-head-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.up-item{border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px}
+.up-item:last-child{margin-bottom:0}
+.up-preview{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;display:block;background:#0b1220}
+.up-name{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:10px}
+.home-foot{display:flex;justify-content:space-between;align-items:center;margin-top:22px;align-self:stretch;font-size:13.5px;color:var(--muted)}
+.linklike{border:none;background:none;color:var(--accent);font-size:13.5px;font-weight:600;padding:4px 0}
+.home-hint{text-align:center;color:var(--muted);font-size:12.5px;margin:16px 0 0;align-self:stretch}
+.link-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.link-row .lb{flex:none;width:62px;font-size:12px;color:var(--muted)}
+.link-row code{flex:1;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:var(--accent-soft);border-radius:8px;padding:8px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link-row button{flex:none;padding:7px 12px;font-size:12.5px}
+@media(min-width:780px){.grid{grid-template-columns:repeat(4,1fr)}.stat .vl{font-size:20px}.brand h1{font-size:22px}}
+@media(min-width:1100px){.grid{grid-template-columns:repeat(5,1fr)}}
+/* 液态玻璃 */
+.bg-blobs{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(600px 420px at 12% 8%,rgba(56,189,248,.38),transparent 62%),radial-gradient(520px 480px at 88% 12%,rgba(167,139,250,.32),transparent 62%),radial-gradient(720px 520px at 50% 92%,rgba(244,114,182,.24),transparent 62%)}
+html.dark .bg-blobs{background:radial-gradient(600px 420px at 12% 8%,rgba(37,99,235,.40),transparent 62%),radial-gradient(520px 480px at 88% 12%,rgba(139,92,246,.36),transparent 62%),radial-gradient(720px 520px at 50% 92%,rgba(236,72,153,.22),transparent 62%)}
+.wrap{position:relative}
+:root{--glass-bg:rgba(255,255,255,.55);--glass-border:rgba(255,255,255,.65);--glass-hi:rgba(255,255,255,.75);--glass-shadow:0 8px 24px rgba(20,32,58,.08)}
+html.dark{--glass-bg:rgba(22,33,58,.55);--glass-border:rgba(255,255,255,.14);--glass-hi:rgba(255,255,255,.12);--glass-shadow:0 8px 24px rgba(0,0,0,.35)}
+.dropzone,.panel,.stat,.tab,.search-box,.mrow,.login,.icon-btn,.filter-btn,.menu,.up-item,button,input[type=text],input[type=password]{background:var(--glass-bg);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%)}
+.panel,.stat,.tab,.search-box,.mrow,.login,.icon-btn,.filter-btn,.menu,.up-item{border-color:var(--glass-border);box-shadow:inset 0 1px 0 var(--glass-hi),var(--glass-shadow)}
+.dropzone{box-shadow:inset 0 1px 0 var(--glass-hi),var(--glass-shadow)}
+.dropzone.drag{background:rgba(37,99,235,.16)}
+.bottomnav,.batchbar{background:var(--glass-bg);-webkit-backdrop-filter:blur(20px) saturate(170%);backdrop-filter:blur(20px) saturate(170%);border-top-color:var(--glass-border)}
+.toast,.lb-x,.lb-arrow{-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+/* 更换管理密码弹窗 */
+.pw-modal{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(4,7,16,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.pw-card{width:100%;max-width:380px;background:var(--glass-bg);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border:1px solid var(--glass-border);border-radius:20px;padding:22px 20px;box-shadow:inset 0 1px 0 var(--glass-hi),0 16px 40px rgba(0,0,0,.25);animation:pwIn .18s ease}
+@keyframes pwIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+.pw-card h3{margin:0 0 6px;font-size:17px}
+.pw-card p{margin:0 0 6px;color:var(--muted);font-size:13px;line-height:1.6}
+.pw-card input{margin-top:10px}
+.pw-err{min-height:20px;margin-top:8px;font-size:13px;color:var(--danger);visibility:hidden}
+.pw-actions{display:flex;gap:10px;margin-top:12px}
+.pw-actions button{flex:1}
+/* 登录页 */
+.login-logo{width:60px;height:60px;margin:2px auto 14px;border-radius:18px;background:linear-gradient(135deg,#38bdf8,#2563eb);display:grid;place-items:center;box-shadow:0 8px 20px rgba(37,99,235,.35)}
+.login-logo svg{width:32px;height:32px;fill:#fff}
+.login h2,.login p{text-align:center}
+.pw-field{position:relative}
+.pw-field input{padding-right:44px}
+.pw-field .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:none;background:none;border-radius:50%;padding:0;display:grid;place-items:center}
+.pw-field .eye svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pw-field .eye.on svg{stroke:var(--accent)}
+</style></head><body>
+<div class="bg-blobs"></div>
+<div class="wrap">
+<header class="topbar">
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+    <div><h1>TG ImageBed Pro</h1><p>基于 Telegram 的无限图床</p></div>
+  </div>
+  <div class="top-actions">
+    <button id="themeToggle" class="icon-btn" title="切换深色模式"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+    <button id="logoutTop" class="icon-btn hidden" title="退出登录"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
+  </div>
+</header>
+
+<section id="setupPanel" class="login hidden">
+  <div class="login-logo"><svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+  <h2>设置管理密码</h2><p>首次打开，先设置一个管理密码（至少 6 位），以后用它登录</p>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <input id="pw1" type="password" placeholder="设置管理密码" autocomplete="new-password">
+    <input id="pw2" type="password" placeholder="再输入一次" autocomplete="new-password">
+    <button id="setupBtn" class="primary">设置并进入</button>
+  </div>
+  <div id="setupNotice" class="notice"></div>
+</section>
+
+<section id="loginPanel" class="login hidden">
+  <div class="login-logo"><svg viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
+  <h2>管理员登录</h2><p>输入管理密码</p>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div class="pw-field"><input id="token" type="password" placeholder="管理密码" autocomplete="current-password"><button id="togglePw" class="eye" type="button" title="显示密码"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+    <button id="login" class="primary">登录</button>
+  </div>
+  <div id="loginNotice" class="notice"></div>
+</section>
+
+<div id="app" class="hidden">
+  <!-- 首页 -->
+  <section id="view-home">
+    <div class="dropzone" id="dropzone">
+      <div class="cloud"><svg viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4M12 12v9"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg></div>
+      <strong>拖拽图片到此处，或点击上传</strong>
+      <p>支持 JPG、PNG、WebP 等格式，单张最大 20MB，每次最多 20 张</p>
+      <input id="files" type="file" accept="image/*" multiple class="hidden">
+      <button id="choose" class="primary"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>选择文件</button>
+      <div id="uploadNotice" class="notice"></div>
+      <div id="uploadProgress" class="hidden">
+        <div class="up-bar"><div id="uploadBarFill"></div></div>
+        <div id="uploadBarText">上传中 0%</div>
+      </div>
+      <div id="uploadResults" class="hidden">
+        <div class="up-divider"></div>
+        <div class="up-head-row">
+          <h3>上传完成 · <span id="upDoneCount">0</span> 张</h3>
+          <div style="display:flex;gap:8px;flex:none">
+            <button id="copyAllLinks" style="font-size:12.5px;padding:8px 10px">复制全部直链</button>
+            <button id="closeResults" style="font-size:12.5px;padding:8px 10px">✕</button>
+          </div>
+        </div>
+        <div id="uploadResultsList"></div>
+      </div>
+      <div class="home-foot">
+        <span>已上传 <b id="homeCount">0</b> 张</span>
+        <button id="goManage" class="linklike">去管理查看全部 →</button>
+      </div>
+      <p class="home-hint">上传后在这里复制直链、Markdown、HTML、BBCode 四种格式。</p>
+    </div>
+  </section>
+
+  <!-- 管理：图库 -->
+  <section id="view-manage" class="hidden">
+    <div class="search-row">
+      <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input id="search" type="text" placeholder="搜索图片、标签或文件名…" autocomplete="off"></div>
+      <div class="filter-btn"><svg width="15" height="15" viewBox="0 0 24 24" style="stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg><select id="sortSel" title="筛选排序"><option value="new">最新在前</option><option value="old">最早在前</option><option value="big">文件最大</option><option value="small">文件最小</option></select></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="all">全部 (<span id="tabAllCount">0</span>)</button>
+      <button class="tab" data-tab="today">最近上传</button>
+      <button class="tab" data-tab="fav">我的收藏</button>
+    </div>
+
+    <div id="grid" class="grid"></div>
+    <div class="pagination" id="pagination"><button id="prev">上一页</button><span id="pageInfo">1 / 1</span><button id="next">下一页</button></div>
+  </section>
+
+  <!-- 统计 -->
+  <section id="view-stats" class="hidden">
+    <div class="big-stats">
+      <div class="stat"><div class="lb">图片总数</div><div class="vl" id="stTotal2">–</div><div class="dl" id="stTotalDelta2"></div></div>
+      <div class="stat"><div class="lb">已用空间</div><div class="vl" id="stSpace2">–</div><div class="dl dim">∞ Telegram 存储</div></div>
+      <div class="stat"><div class="lb">成功上传</div><div class="vl" id="stSuccess2">–</div><div class="dl" id="stSuccessDelta2"></div></div>
+      <div class="stat"><div class="lb">今日上传</div><div class="vl" id="stToday2">–</div><div class="dl" id="stTodayDelta2"></div></div>
+    </div>
+    <div class="panel"><h3>存储与服务</h3>
+      <div class="kv"><span>图片存储</span><span>Telegram（无限空间）</span></div>
+      <div class="kv"><span>索引数据库</span><span>Cloudflare D1</span></div>
+      <div class="kv"><span>单张上限</span><span>20 MB</span></div>
+      <div class="kv"><span>单次上传</span><span>最多 20 张</span></div>
+      <div class="kv"><span>删除重试</span><span>每 15 分钟自动重试</span></div>
+      <div class="kv"><span>图片直链</span><span id="originLabel"></span></div>
+    </div>
+  </section>
+
+  <!-- 设置 -->
+  <section id="view-settings" class="hidden">
+    <div class="panel"><h3>账号</h3>
+      <div class="kv"><span>管理密码</span><span>••••••••</span></div>
+      <div style="display:flex;gap:10px;margin-top:14px"><button id="changeToken" class="primary" style="flex:1">更换管理密码</button><button id="logout2" style="flex:1">退出登录</button></div>
+    </div>
+    <div class="panel"><h3>Telegram 机器人</h3>
+      <div class="kv"><span>绑定状态</span><span id="tgStatus">读取中…</span></div>
+      <div id="tgEnvNote" class="hidden" style="font-size:12.5px;color:var(--muted);margin-top:10px">当前由部署变量提供，页面修改不生效。</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+        <input id="tgToken" type="password" placeholder="机器人 Token（@BotFather 获取）" autocomplete="off">
+        <input id="tgChatId" type="text" placeholder="频道 ID（如 -1001234567890）" autocomplete="off" inputmode="numeric">
+        <div style="display:flex;gap:10px"><button id="tgSave" class="primary" style="flex:1">保存并绑定</button><button id="tgUnbind" class="danger">解绑</button></div>
+      </div>
+      <p style="color:var(--muted);font-size:12.5px;line-height:1.7;margin:12px 0 0">去 Telegram 找 @BotFather 创建机器人拿到 Token；再建一个私密频道，把机器人加为管理员（能发消息、删消息），频道 ID 是一串 -100 开头的数字。保存时会先校验 Token，并确认机器人是该频道管理员。已绑定后如需更换，先点解绑再重新填写。</p>
+      <div id="tgNotice" class="notice"></div>
+    </div>
+    <div class="panel"><h3>关于</h3>
+      <div class="kv"><span>版本</span><span>TG ImageBed Pro · MVP</span></div>
+      <div class="kv"><span>域名</span><span id="domainLabel"></span></div>
+      <div class="kv"><span>图片直链格式</span><span>/i/图片ID</span></div>
+    </div>
+    <div class="foot">文件由 Telegram 存储 · 索引由 Cloudflare D1 管理</div>
+  </section>
+
+  <!-- 大图预览 -->
+  <div id="lightbox" class="hidden">
+    <button id="lbClose" class="lb-x">✕</button>
+    <button id="lbPrev" class="lb-arrow">‹</button>
+    <img id="lbImg" alt="">
+    <button id="lbNext" class="lb-arrow">›</button>
+    <div class="lb-bar">
+      <div class="lb-info"><div id="lbName"></div><div id="lbMeta"></div></div>
+      <div class="lb-actions"><button id="lbCopy">复制链接</button><button id="lbDel" class="danger">删除</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="batchbar hidden" id="batchbar"><div class="inner">
+  <span class="cnt" id="batchCount">已选择 0 张</span>
+  <button id="batchCopy">复制链接</button>
+  <button id="batchDownload">下载</button>
+  <button id="batchDelete" class="danger">删除</button>
+  <div class="more-wrap"><button id="batchMore">更多 ▾</button>
+    <div class="menu hidden" id="moreMenu">
+      <button id="mSelectAll">本页全选</button>
+      <button id="mClearSel">取消选择</button>
+      <button id="mFavSel">收藏所选</button>
+      <button id="mUnfavSel">取消收藏所选</button>
+    </div>
+  </div>
+</div></div>
+
+<nav class="bottomnav hidden" id="bottomnav"><div class="inner">
+  <button class="nav-it active" data-view="home"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>首页</button>
+  <button class="nav-it" data-view="manage"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>管理</button>
+  <button class="nav-it" data-view="stats"><svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>统计</button>
+  <button class="nav-it" data-view="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>设置</button>
+</div></nav>
+<div class="toast" id="toast"></div>
+<div id="pwModal" class="pw-modal hidden">
+  <div class="pw-card">
+    <h3>更换管理密码</h3>
+    <p>换完之后，其他设备上登录的账号会全部退出，要用新密码重新登录。</p>
+    <input id="pwOld" type="password" placeholder="当前管理密码" autocomplete="current-password">
+    <input id="pwNew" type="password" placeholder="新密码（至少 6 位）" autocomplete="new-password">
+    <input id="pwNew2" type="password" placeholder="再输入一次新密码" autocomplete="new-password">
+    <div id="pwErr" class="pw-err"></div>
+    <div class="pw-actions"><button id="pwCancel">取消</button><button id="pwSubmit" class="primary">确认更换</button></div>
+  </div>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s);const $$=s=>[...document.querySelectorAll(s)];
+let token=localStorage.getItem('tgib_token')||'',page=1,pages=1,total=0,selected=new Set(),items=[],tab='all',sortMode='new',stats=null;
+const limit=24;
+let favs={};try{favs=JSON.parse(localStorage.getItem('tgib_favs')||'{}')}catch(e){favs={}}
+const saveFavs=()=>localStorage.setItem('tgib_favs',JSON.stringify(favs));
+/* 主题 */
+if(localStorage.getItem('tgib_theme')==='dark')document.documentElement.classList.add('dark');
+$('#themeToggle').onclick=()=>{const d=document.documentElement.classList.toggle('dark');localStorage.setItem('tgib_theme',d?'dark':'light')};
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200)}
+function notice(el,msg,ok=false){el.textContent=msg;el.className='notice show '+(ok?'ok':'bad')}
+function headers(){return {Authorization:'Bearer '+token}}
+async function call(path,opts={}){const r=await fetch(path,{...opts,headers:{...headers(),...(opts.headers||{})}});if(r.status===401){logout();throw Error('登录凭证失效')}if(!r.ok){let d=await r.json().catch(()=>({}));throw Error(d.error||'请求失败')}return r.json()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmt(n){if(n<1024)return n+' B';if(n<1024**2)return (n/1024).toFixed(1)+' KB';if(n<1024**3)return (n/1024**2).toFixed(2)+' MB';return (n/1024**3).toFixed(2)+' GB'}
+function showApp(){$('#loginPanel').classList.add('hidden');$('#app').classList.remove('hidden');$('#bottomnav').classList.remove('hidden');$('#logoutTop').classList.remove('hidden');$('#originLabel').textContent=location.origin+'/i/…';$('#domainLabel').textContent=location.host;loadStats();load()}
+async function logout(){try{await fetch('/api/auth/logout',{method:'POST',headers:headers()})}catch(e){}token='';localStorage.removeItem('tgib_token');$('#app').classList.add('hidden');$('#bottomnav').classList.add('hidden');$('#batchbar').classList.add('hidden');$('#logoutTop').classList.add('hidden');$('#setupPanel').classList.add('hidden');$('#loginPanel').classList.remove('hidden')}
+$('#togglePw').onclick=()=>{const i=$('#token');const show=i.type==='password';i.type=show?'text':'password';$('#togglePw').classList.toggle('on',show);$('#togglePw').title=show?'隐藏密码':'显示密码'};
+$('#login').onclick=async()=>{const pw=$('#token').value.trim();if(!pw)return notice($('#loginNotice'),'请输入密码');const btn=$('#login');btn.disabled=true;btn.textContent='登录中…';try{const r=await fetch('/api/auth/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:pw})});const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||'密码不正确');token=j.token;localStorage.setItem('tgib_token',token);showApp()}catch(e){notice($('#loginNotice'),e.message);token=''}finally{btn.disabled=false;btn.textContent='登录'}};
+$('#token').onkeydown=e=>{if(e.key==='Enter')$('#login').click()};
+$('#setupBtn').onclick=async()=>{const a=$('#pw1').value,b=$('#pw2').value;if(a.length<6)return notice($('#setupNotice'),'密码至少 6 位');if(a!==b)return notice($('#setupNotice'),'两次输入不一致');try{const r=await fetch('/api/auth/setup',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:a})});const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||'设置失败');token=j.token;localStorage.setItem('tgib_token',token);showApp()}catch(e){notice($('#setupNotice'),e.message)}};
+$('#pw2').onkeydown=e=>{if(e.key==='Enter')$('#setupBtn').click()};
+$('#logout2').onclick=logout;
+$('#logoutTop').onclick=logout;
+/* 更换管理密码弹窗 */
+function pwErr(m){const e=$('#pwErr');e.textContent=m||'';e.style.visibility=m?'visible':'hidden'}
+function openPwModal(){$('#pwOld').value='';$('#pwNew').value='';$('#pwNew2').value='';pwErr('');$('#pwModal').classList.remove('hidden');setTimeout(()=>$('#pwOld').focus(),60)}
+function closePwModal(){$('#pwModal').classList.add('hidden')}
+$('#changeToken').onclick=openPwModal;
+$('#pwCancel').onclick=closePwModal;
+$('#pwModal').addEventListener('click',e=>{if(e.target.id==='pwModal')closePwModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#pwModal').classList.contains('hidden'))closePwModal()});
+['pwOld','pwNew','pwNew2'].forEach(id=>$('#'+id).addEventListener('keydown',e=>{if(e.key==='Enter')$('#pwSubmit').click()}));
+$('#pwSubmit').onclick=async()=>{
+const oldPw=$('#pwOld').value,np=$('#pwNew').value,np2=$('#pwNew2').value;
+if(!oldPw)return pwErr('请输入当前管理密码');
+if(np.length<6)return pwErr('新密码至少 6 位');
+if(np!==np2)return pwErr('两次输入的新密码不一致');
+const btn=$('#pwSubmit');btn.disabled=true;btn.textContent='更换中…';
+try{const r=await fetch('/api/auth/change',{method:'POST',headers:{...headers(),'content-type':'application/json'},body:JSON.stringify({oldPassword:oldPw,newPassword:np})});const j=await r.json().catch(()=>({}));
+if(!r.ok){if(j.error==='Unauthorized'){closePwModal();logout();return}throw Error(j.error||'更换失败')}
+token=r.token;localStorage.setItem('tgib_token',token);closePwModal();toast('管理密码已更换')}
+catch(e){pwErr(e.message)}
+finally{btn.disabled=false;btn.textContent='确认更换'}};
+/* 上传 */
+$('#choose').onclick=()=>$('#files').click();
+$('#files').onchange=()=>{uploadFiles([...$('#files').files]);$('#files').value=''};
+const dz=$('#dropzone');
+['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag')}));
+['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag')}));
+dz.addEventListener('drop',e=>{const fs=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));if(fs.length)uploadFiles(fs)});
+async function uploadFiles(fs){if(!fs.length)return;
+const bar=$('#uploadProgress'),fill=$('#uploadBarFill'),txt=$('#uploadBarText');
+bar.classList.remove('hidden');fill.style.width='0%';txt.textContent='上传中 0%';
+clearTimeout($('#uploadNotice')._h);notice($('#uploadNotice'),`开始上传 ${fs.length} 张图片…`,true);
+const fd=new FormData();fs.slice(0,20).forEach(f=>fd.append('files',f));
+try{
+const d=await new Promise((resolve,reject)=>{
+const x=new XMLHttpRequest();
+x.open('POST','/api/upload');
+x.setRequestHeader('Authorization',headers().Authorization);
+x.upload.onprogress=e=>{if(e.lengthComputable){const p=Math.round(e.loaded/e.total*100);fill.style.width=p+'%';txt.textContent='上传中 '+p+'%'}};
+x.onload=()=>{let j=null;try{j=JSON.parse(x.responseText)}catch(e){}if(x.status>=200&&x.status<300&&j)resolve(j);else reject(new Error((j&&j.error)||('HTTP '+x.status)))};
+x.onerror=()=>reject(new Error('网络错误'));
+x.send(fd)});
+fill.style.width='100%';txt.textContent='上传中 100%';
+const ok=d.results.filter(x=>x.ok).length;const fails=d.results.filter(x=>!x.ok);
+notice($('#uploadNotice'),`完成：成功 ${ok} 张，失败 ${fails.length} 张${fails.length?`；${fails.map(x=>x.name+': '+x.error).join(' | ')}`:''}`,fails.length===0);
+clearTimeout($('#uploadNotice')._h);if(fails.length===0)$('#uploadNotice')._h=setTimeout(()=>$('#uploadNotice').classList.remove('show'),3000);
+if(ok)renderUploadResults(d.results.filter(x=>x.ok));
+page=1;await loadStats();await load()}catch(e){notice($('#uploadNotice'),e.message)}
+finally{setTimeout(()=>bar.classList.add('hidden'),600)}}
+/* 上传结果：直链 / Markdown / HTML / BBCode，各带复制按钮 */
+let lastUploaded=[];
+function renderUploadResults(results){
+  lastUploaded=results;
+  const list=$('#uploadResultsList');list.innerHTML='';
+  $('#upDoneCount').textContent=results.length;
+  for(const r of results){
+    const url=r.url,name=r.name||'image';
+    const md=`![${name.replace(/[\[\]\\]/g,'\\$&')}](${url})`;
+    const html=`<img src="${url}" alt="${esc(name)}">`;
+    const bb=`[img]${url}[/img]`;
+    const div=document.createElement('div');div.className='up-item';
+    div.innerHTML=`<img class="up-preview" loading="lazy" src="${url}" alt=""><div class="up-name" title="${esc(name)}">${esc(name)}</div>`+
+      [['直链',url],['Markdown',md],['HTML',html],['BBCode',bb]].map(([lb,txt])=>`<div class="link-row"><span class="lb">${lb}</span><code title="${esc(txt)}">${esc(txt)}</code><button type="button">复制</button></div>`).join('');
+    div.querySelectorAll('.link-row').forEach((row,i)=>{
+      const txt=[url,md,html,bb][i];
+      row.querySelector('button').onclick=async e=>{await copyText(txt,'已复制');const b=e.target;b.textContent='已复制';setTimeout(()=>b.textContent='复制',1500)};
+    });
+    list.appendChild(div);
+  }
+  $('#uploadResults').classList.remove('hidden');
+  $('#uploadResults').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('#copyAllLinks').onclick=()=>{if(!lastUploaded.length)return;copyText(lastUploaded.map(r=>r.url).join('\n'),`已复制 ${lastUploaded.length} 个直链`)};
+$('#closeResults').onclick=()=>$('#uploadResults').classList.add('hidden');
+$('#goManage').onclick=()=>document.querySelector('.nav-it[data-view="manage"]').click();
+/* 统计 */
+async function loadStats(){try{stats=await call('/api/stats');const t=stats.total||0,b=stats.totalBytes||0,td=stats.today||0;
+$('#stTotal2').textContent=t.toLocaleString();
+$('#stSpace2').textContent='约 '+fmt(b);
+$('#stSuccess2').textContent=t.toLocaleString();
+$('#stToday2').textContent=td.toLocaleString();
+const d=td>0?'↑ +'+td:'今日暂无新增';['#stTotalDelta2','#stSuccessDelta2','#stTodayDelta2'].forEach(s=>$(s).textContent=d);
+$('#tabAllCount').textContent=t.toLocaleString();$('#homeCount').textContent=t.toLocaleString()}catch(e){/* 统计失败不阻塞列表 */}}
+/* 列表 */
+function listPath(){const q=$('#search').value.trim();let p=`/api/images?page=${page}&limit=${limit}&q=${encodeURIComponent(q)}`;if(tab==='today')p+='&filter=today';return p}
+async function load(){try{
+if(tab==='fav'){items=Object.values(favs);total=items.length;pages=1;render();return}
+const d=await call(listPath());items=d.items;total=d.total;pages=d.pages;render()}catch(e){$('#grid').innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
+function sortedItems(){const a=[...items];if(sortMode==='old')a.sort((x,y)=>x.created_at<y.created_at?-1:1);else if(sortMode==='big')a.sort((x,y)=>y.size_bytes-x.size_bytes);else if(sortMode==='small')a.sort((x,y)=>x.size_bytes-y.size_bytes);else a.sort((x,y)=>x.created_at<y.created_at?-1:1);return a}
+function render(){const g=$('#grid');g.innerHTML='';const list=sortedItems();
+if(!list.length){g.innerHTML='<div class="empty">暂无图片，拖一张上来试试</div>'}
+for(const x of list){const div=document.createElement('article');div.className='item'+(selected.has(x.id)?' sel':'');
+div.innerHTML=`<button class="fav ${favs[x.id]?'on':''}" title="收藏">★</button><button class="ck" title="选择"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></button><img loading="lazy" src="/i/${encodeURIComponent(x.id)}" alt=""><span class="size">${fmt(x.size_bytes)}</span>`;
+div.querySelector('.ck').onclick=e=>{e.stopPropagation();toggleSelect(x.id)};
+div.querySelector('.fav').onclick=e=>{e.stopPropagation();if(favs[x.id]){delete favs[x.id]}else{favs[x.id]={id:x.id,original_name:x.original_name,mime_type:x.mime_type,size_bytes:x.size_bytes,created_at:x.created_at}}saveFavs();render();if(tab==='fav')load()};
+div.querySelector('img').onclick=()=>openLightbox(x.id);
+g.appendChild(div)}
+$('#pageInfo').textContent=`${page} / ${pages}`;$('#prev').disabled=page<=1;$('#next').disabled=page>=pages;
+$('#pagination').classList.toggle('hidden',tab==='fav');
+updateBatch()}
+function toggleSelect(id){if(selected.has(id))selected.delete(id);else selected.add(id);render()}
+function updateBatch(){const n=selected.size;$('#batchbar').classList.toggle('hidden',n===0);$('#batchCount').textContent=`已选择 ${n} 张`}
+async function copyText(text,msg){try{await navigator.clipboard.writeText(text)}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}toast(msg||'已复制')}
+async function deleteIds(ids){if(!ids.length)return;if(!confirm(`确定删除所选 ${ids.length} 张图片？`))return;try{const d=await call('/api/delete',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({ids})});toast(`已隐藏 ${d.hidden} 张，Telegram 删除成功 ${d.deleted} 张`);selected.clear();await loadStats();await load()}catch(e){alert(e.message)}}
+/* 大图预览 */
+let lbIndex=-1;
+function openLightbox(id){const list=sortedItems();lbIndex=list.findIndex(x=>x.id===id);if(lbIndex<0)return;showLb()}
+function showLb(){const list=sortedItems();const x=list[lbIndex];if(!x){closeLb();return}
+$('#lbImg').src='/i/'+encodeURIComponent(x.id);
+$('#lbName').textContent=x.original_name;
+$('#lbMeta').textContent=fmt(x.size_bytes)+' · '+new Date(x.created_at+'Z').toLocaleString();
+$('#lightbox').classList.remove('hidden');document.body.style.overflow='hidden'}
+function closeLb(){$('#lightbox').classList.add('hidden');document.body.style.overflow='';lbIndex=-1}
+function lbStep(d){const list=sortedItems();if(!list.length)return;lbIndex=(lbIndex+d+list.length)%list.length;showLb()}
+$('#lbClose').onclick=closeLb;
+$('#lbPrev').onclick=()=>lbStep(-1);
+$('#lbNext').onclick=()=>lbStep(1);
+$('#lbCopy').onclick=()=>{const x=sortedItems()[lbIndex];if(x)copyText(location.origin+'/i/'+x.id,'链接已复制')};
+$('#lbDel').onclick=()=>{const x=sortedItems()[lbIndex];if(!x)return;const id=x.id;closeLb();deleteIds([id])};
+$('#lightbox').addEventListener('click',e=>{if(e.target.id==='lightbox')closeLb()});
+document.addEventListener('keydown',e=>{if(lbIndex<0)return;if(e.key==='Escape')closeLb();else if(e.key==='ArrowLeft')lbStep(-1);else if(e.key==='ArrowRight')lbStep(1)});
+let lbTouchX=null;
+$('#lbImg').addEventListener('touchstart',e=>{lbTouchX=e.touches[0].clientX},{passive:true});
+$('#lbImg').addEventListener('touchend',e=>{if(lbTouchX===null)return;const dx=e.changedTouches[0].clientX-lbTouchX;lbTouchX=null;if(Math.abs(dx)>50)lbStep(dx<0?1:-1)},{passive:true});
+/* 批量条 */
+$('#batchCopy').onclick=()=>{const urls=[...selected].map(id=>location.origin+'/i/'+id);copyText(urls.join('\n'),`已复制 ${urls.length} 个链接`)};
+$('#batchDownload').onclick=()=>{const ids=[...selected];ids.forEach((id,i)=>{setTimeout(()=>{const a=document.createElement('a');a.href='/i/'+id;a.download='';document.body.appendChild(a);a.click();a.remove()},i*400)})};
+$('#batchDelete').onclick=()=>deleteIds([...selected]);
+$('#batchMore').onclick=e=>{e.stopPropagation();$('#moreMenu').classList.toggle('hidden')};
+document.addEventListener('click',()=>$('#moreMenu').classList.add('hidden'));
+$('#mSelectAll').onclick=()=>{items.forEach(x=>selected.add(x.id));render()};
+$('#mClearSel').onclick=()=>{selected.clear();render()};
+$('#mFavSel').onclick=()=>{items.filter(x=>selected.has(x.id)).forEach(x=>favs[x.id]={id:x.id,original_name:x.original_name,mime_type:x.mime_type,size_bytes:x.size_bytes,created_at:x.created_at});saveFavs();toast('已收藏所选');render()};
+$('#mUnfavSel').onclick=()=>{[...selected].forEach(id=>delete favs[id]);saveFavs();toast('已取消收藏');render()};
+/* Tabs / 搜索 / 排序 / 分页 */
+$$('.tab').forEach(b=>b.onclick=()=>{$$('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');tab=b.dataset.tab;page=1;selected.clear();load()});
+let searchTimer=null;
+$('#search').addEventListener('input',()=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{page=1;load()},500)});
+$('#search').onkeydown=e=>{if(e.key==='Enter'){page=1;load()}};
+$('#sortSel').onchange=e=>{sortMode=e.target.value;render()};
+$('#prev').onclick=()=>{if(page>1){page--;load()}};
+$('#next').onclick=()=>{if(page<pages){page++;load()}};
+/* Telegram 绑定 */
+let tgBound=false;
+async function loadTgSettings(){try{const d=await call('/api/settings/telegram');
+tgBound=!!d.configured;
+$('#tgStatus').textContent=d.configured?`已绑定 ${d.botUsername||''} · ${d.chatId||''}`:'未绑定';
+$('#tgEnvNote').classList.toggle('hidden',!d.fromEnv);
+$('#tgChatId').value=d.chatId||'';$('#tgToken').value='';
+$('#tgToken').placeholder=d.configured?'已绑定':'机器人 Token（@BotFather 获取）';
+$('#tgSave').textContent=d.configured?'已绑定':'保存并绑定';
+$('#tgToken').disabled=!!d.configured;$('#tgChatId').disabled=!!d.configured;
+$('#tgSave').disabled=!!d.configured||!!d.fromEnv;$('#tgUnbind').disabled=!!d.fromEnv;
+}catch(e){$('#tgStatus').textContent='读取失败'}}
+$('#tgSave').onclick=async()=>{const botToken=$('#tgToken').value.trim(),chatId=$('#tgChatId').value.trim();
+if(!chatId)return notice($('#tgNotice'),'请填写频道 ID');
+if(!botToken&&!tgBound)return notice($('#tgNotice'),'请填写 Token 和频道 ID');
+notice($('#tgNotice'),'正在校验机器人…',true);
+try{const d=await call('/api/settings/telegram',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({botToken,chatId})});
+notice($('#tgNotice'),`已绑定 ${d.botUsername||''} · ${d.chatId||''}`,true);await loadTgSettings()}
+catch(e){notice($('#tgNotice'),e.message)}};
+$('#tgUnbind').onclick=async()=>{if(!confirm('确定解绑 Telegram 机器人吗？解绑后无法上传新图片，已上传的图片不受影响。'))return;
+try{await call('/api/settings/telegram',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({botToken:'',chatId:''})});
+notice($('#tgNotice'),'已解绑',true);await loadTgSettings()}catch(e){notice($('#tgNotice'),e.message)}};
+/* 底部导航 */
+$$('.nav-it').forEach(b=>b.onclick=()=>{$$('.nav-it').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+const v=b.dataset.view;['home','manage','stats','settings'].forEach(k=>$('#view-'+k).classList.toggle('hidden',k!==v));
+if(v==='manage')render();if(v==='stats')loadStats();if(v==='settings')loadTgSettings();window.scrollTo({top:0})});
+async function boot(){
+  if(token){try{const t=await fetch('/api/images?limit=1',{headers:headers()});if(t.ok){showApp();return}}catch(e){}}
+  try{const s=await (await fetch('/api/auth/status')).json();
+    if(s.setupRequired){$('#loginPanel').classList.add('hidden');$('#setupPanel').classList.remove('hidden')}
+    else{$('#setupPanel').classList.add('hidden');$('#loginPanel').classList.remove('hidden')}
+  }catch(e){$('#loginPanel').classList.remove('hidden')}
+}
+boot();
+</script></body></html>

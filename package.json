@@ -1,0 +1,1 @@
+{"description":"TG ImageBed Pro：基于 Telegram 的无限图床（Cloudflare Worker + D1）","name":"tg-imagebed-pro1","private":true,"scripts":{"deploy":"npx -y wrangler@4 deploy"},"version":"1.0.0"}
